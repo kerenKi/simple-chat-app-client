@@ -4,7 +4,20 @@ import './App.css';
 class App extends React.Component {
   state = {
     user_name: '',
-    messages: [],
+    messages: [
+      {
+        user_name:'keren',
+        text:'Hi'
+      },
+      {
+        user_name:'yossi',
+        text:'Hi to you too'
+      },
+      {
+        user_name:'yossi',
+        text:'how are you?'
+      }
+    ],
     text: '',
     user_logged: false
   }
@@ -27,6 +40,13 @@ class App extends React.Component {
 
   onSendMessage = (event) => {
     event.preventDefault()
+    const message = {
+      user_name: this.state.user_name,
+      text: this.state.text
+    }
+    this.setState({
+      messages: [...this.state.messages, message]
+    })
     console.log(this.state.text)
     this.setState({
       text: ''
@@ -57,6 +77,11 @@ class App extends React.Component {
             <input type="submit" /> 
           </form>
 
+          <ul>
+            {this.state.messages && this.state.messages.map((message, index) => <li key={index}>
+              {message.user_name}: {message.text}
+            </li>)}
+          </ul>
       </div>
     )
   }
