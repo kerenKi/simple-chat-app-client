@@ -24,21 +24,27 @@ class App extends React.Component {
     user_logged: false
   }
 
+  onGetMessage(message){
+    console.log('onGetMessage')
+    console.log('onGetMessage message:', message)
+    this.setState({
+      messages: [...this.state.messages, message]
+    })
+  }
+
   onChange = (event) => {
-    console.log(event.target.name)
     this.setState({
       [event.target.name]: event.target.value
     })
-    console.log(this.state)
   }
 
   onSubmitName = (event) => {
     event.preventDefault()
-    connectionToServer()
+    connectionToServer(this.onGetMessage)
+
     this.setState({
       user_logged: true
     })
-    console.log(this.state.user_name)
   }
 
   onSendMessage = (event) => {
@@ -59,7 +65,6 @@ class App extends React.Component {
     this.setState({
       messages: [...this.state.messages, message]
     })
-    console.log(this.state.text)
     this.setState({
       text: ''
     })
