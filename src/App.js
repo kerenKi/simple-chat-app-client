@@ -11,14 +11,26 @@ class App extends React.Component {
       user_name: '',
       messages: [],
       text: '',
-      user_logged: false
+      user_logged: false,
+      userJoined: []
     }
 
     this.socket = io('localhost:4000')
 
     this.socket.on('newMessage', function(message){
-        addMessage(message);
+        addMessage(message)
     })
+
+    this.socket.on('addUserToChat',function(usersArray){
+      addUser(usersArray)
+    })
+
+    const addUser = (usersArray) => {
+      console.log('user added to chat:', usersArray)
+      this.setState({
+        userJoined: usersArray
+      })
+    }
 
     const addMessage = (message) => {
         this.setState({
@@ -34,6 +46,7 @@ class App extends React.Component {
 
     this.onSubmitName = (event) => {
       event.preventDefault()
+      this.socket.emit('newUser', this.state.user_name)
       this.setState({
         user_logged: true
       })
@@ -63,6 +76,9 @@ class App extends React.Component {
       <div className="App">
         <h1>Welcome to the best chat app ever</h1>
         { this.state.user_logged && <h1>Hello {this.state.user_name}</h1> }
+        <ul>
+        { this.state.userJoined[0] && this.state.userJoined.map((user, index) => <li key={index}> {user}  joined the chat </li>)}
+        </ul>  
         { !this.state.user_logged && 
           <div>
             <h2>What should we call you?</h2>
@@ -73,14 +89,14 @@ class App extends React.Component {
               <input type="submit" /> 
             </form>
           </div> }
+          {this.state.user_logged && <div>
+            <form onSubmit={this.onSendMessage}>
+              <label> Post a new message </label>
+              <input type="text" name="text" value={this.state.text} onChange={this.onChange} required/>
 
-          <form onSubmit={this.onSendMessage}>
-            <label> Post a new message </label>
-            <input type="text" name="text" value={this.state.text} onChange={this.onChange} required/>
-
-            <input type="submit" value="Post"/> 
-          </form>
-
+              <input type="submit" value="Post"/> 
+            </form>
+          </div>}
           <ul>
             {this.state.messages && this.state.messages.map((message, index) => <li key={index}>
               {message.user_name}: {message.text}
