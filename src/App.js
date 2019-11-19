@@ -78,7 +78,7 @@ class App extends React.Component {
             <label> Post a new message </label>
             <input type="text" name="text" value={this.state.text} onChange={this.onChange} required/>
 
-            <input type="submit" /> 
+            <input type="submit" value="Post"/> 
           </form>
 
           <ul>
