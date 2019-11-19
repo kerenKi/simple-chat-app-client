@@ -1,9 +1,21 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto+Slab&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Signika&display=swap');
 .App {
   text-align: center;
+  font-family: 'Roboto Slab', serif;
+}
+
+h1 {
+  font-family: 'Signika', sans-serif;
 }
 
 ul {
   list-style: none;
+}
+
+li {
+  padding: 5px;
+  margin: auto;
 }
 
 form label {
