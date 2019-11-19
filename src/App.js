@@ -1,5 +1,7 @@
 import React from 'react';
 import './App.css';
+import request from 'superagent';
+import { connectionToServer } from './api'
 
 class App extends React.Component {
   state = {
@@ -32,6 +34,7 @@ class App extends React.Component {
 
   onSubmitName = (event) => {
     event.preventDefault()
+    connectionToServer()
     this.setState({
       user_logged: true
     })
@@ -44,6 +47,15 @@ class App extends React.Component {
       user_name: this.state.user_name,
       text: this.state.text
     }
+
+    request.post('http://localhost:4000/messages')
+    .send({
+      message: message
+    })
+    .then(res => console.log(res))
+    .catch(console.error)
+
+    //TODO: don't add to state, let it come from the server
     this.setState({
       messages: [...this.state.messages, message]
     })
@@ -57,13 +69,12 @@ class App extends React.Component {
     return (
       <div className="App">
         <h1>Welcome to the best chat app ever</h1>
-
         { this.state.user_logged && <h1>Hello {this.state.user_name}</h1> }
         { !this.state.user_logged && 
           <div>
             <h2>How should we call you?</h2>
             <form onSubmit={this.onSubmitName}>
-              <label>Pick a nickname</label>
+              <label>Pick a nickname to join the chat room</label>
               <input type="text" name="user_name" onChange={this.onChange} required/>
 
               <input type="submit" /> 
