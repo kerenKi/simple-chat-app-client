@@ -1,75 +1,63 @@
 import React from 'react';
 import './App.css';
 import request from 'superagent';
-import { connectionToServer } from './api'
+import io from "socket.io-client";
 
 class App extends React.Component {
-  state = {
-    user_name: '',
-    messages: [
-      {
-        user_name:'keren',
-        text:'Hi'
-      },
-      {
-        user_name:'yossi',
-        text:'Hi to you too'
-      },
-      {
-        user_name:'yossi',
-        text:'how are you?'
-      }
-    ],
-    text: '',
-    user_logged: false
-  }
-
-  onGetMessage(message){
-    console.log('onGetMessage')
-    console.log('onGetMessage message:', message)
-    this.setState({
-      messages: [...this.state.messages, message]
-    })
-  }
-
-  onChange = (event) => {
-    this.setState({
-      [event.target.name]: event.target.value
-    })
-  }
-
-  onSubmitName = (event) => {
-    event.preventDefault()
-    connectionToServer(this.onGetMessage)
-
-    this.setState({
-      user_logged: true
-    })
-  }
-
-  onSendMessage = (event) => {
-    event.preventDefault()
-    const message = {
-      user_name: this.state.user_name,
-      text: this.state.text
+  constructor(props){
+    super(props);
+    
+    this.state = {
+      user_name: '',
+      messages: [],
+      text: '',
+      user_logged: false
     }
 
-    request.post('http://localhost:4000/messages')
-    .send({
-      message: message
-    })
-    .then(res => console.log(res))
-    .catch(console.error)
+    this.socket = io('localhost:4000')
 
-    //TODO: don't add to state, let it come from the server
-    this.setState({
-      messages: [...this.state.messages, message]
+    this.socket.on('newMessage', function(message){
+        addMessage(message);
     })
-    this.setState({
-      text: ''
-    })
+
+    const addMessage = (message) => {
+        this.setState({
+          messages: [...this.state.messages, message]
+        })
+    }
+
+    this.onChange = (event) => {
+      this.setState({
+        [event.target.name]: event.target.value
+      })
+    }
+
+    this.onSubmitName = (event) => {
+      event.preventDefault()
+      this.setState({
+        user_logged: true
+      })
+    }
+
+    this.onSendMessage = (event) => {
+      event.preventDefault()
+      const message = {
+        user_name: this.state.user_name,
+        text: this.state.text
+      }
+
+      request.post('http://localhost:4000/messages')
+      .send({
+        message: message
+      })
+      .then(res => console.log(res))
+      .catch(console.error)
+
+      this.setState({
+        text: ''
+      })
+    }
   }
-
   render(){
     return (
       <div className="App">
@@ -77,7 +65,7 @@ class App extends React.Component {
         { this.state.user_logged && <h1>Hello {this.state.user_name}</h1> }
         { !this.state.user_logged && 
           <div>
-            <h2>How should we call you?</h2>
+            <h2>What should we call you?</h2>
             <form onSubmit={this.onSubmitName}>
               <label>Pick a nickname to join the chat room</label>
               <input type="text" name="user_name" onChange={this.onChange} required/>
